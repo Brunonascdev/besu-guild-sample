@@ -37,6 +37,7 @@ README.md
 Before you begin, ensure you have the following installed:
 
 - [Hyperledger Besu](https://besu.hyperledger.org/private-networks/get-started/install/binary-distribution)
+- [Prometheus (optional)](https://prometheus.io/download/)
 
 The `Sample_Network` folder is preconfigured for local execution. To start the network, follow these steps:
 
@@ -69,6 +70,26 @@ chmod +x start_node1.sh && chmod +x start_node2.sh && chmod +x start_node3.sh
 ```bash
 ./start_node3.sh
 ```
+
+### Monitoring the Network
+
+To monitor the network using Prometheus, follow these steps:
+
+1. Navigate to the scripts folder:
+
+```bash
+cd Sample_Network/scripts
+```
+
+2. Start Prometheus:
+
+```bash
+./start_prometheus.sh
+```
+
+3. Open a browser and navigate to `http://localhost:9090` to access the Prometheus dashboard. More infomation on setting up Prometheus can be found in the [Hyperledger Besu documentation](https://besu.hyperledger.org/development/public-networks/how-to/monitor/metrics#view-prometheus-graphical-interface).
+
+To know more about the network setup, refer to the [Hyperledger Besu documentation](https://besu.hyperledger.org/private-networks/tutorials/clique).
 
 ## Deploying the Token Contract
 

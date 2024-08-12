@@ -133,3 +133,5 @@ dist
 caches/
 database/
 DATABASE_METADATA.json
+besu.networks
+besu.ports
