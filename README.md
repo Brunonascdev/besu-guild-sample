@@ -1,284 +1,181 @@
----
-title: Create a Clique network
-sidebar_position: 4
-description: Create a private network using the Clique consensus protocol.
-tags:
-  - private networks
----
+# Introduction to Hyperledger Besu Guild
 
-# Create a private network using Clique
+This repository was created as a sample of **Hyperledger Besu**.
 
-A private network provides a configurable network for testing. This private network uses the [Clique (proof of authority) consensus protocol].
-
-The steps in this tutorial create an isolated, but not protected or secure, Ethereum private network. We recommend running the private network behind a properly configured firewall.
-
-## Prerequisites
-
-- [Hyperledger Besu](../get-started/install/binary-distribution.md)
-- [Curl (or similar webservice client)](https://curl.haxx.se/download.html).
-
-## Steps
-
-Listed on the right-hand side of the page are the steps to create a private network using Clique.
-
-### 1. Create directories
-
-Each node requires a data directory for the blockchain data. When the node starts, Besu saves the [node key](../../public-networks/concepts/node-keys.md) in this directory.
-
-Create directories for your private network, each of the three nodes, and a data directory for each node:
+The folder structure looks like this:
 
 ```bash
-Clique-Network/
+Sample_Network/
 ├── Node-1
 │   ├── data
 ├── Node-2
 │   ├── data
 └── Node-3
     ├── data
+Token_Client/
+├── index.ts
+Token_Contract/
+├── contracts
+│   ├── Token.sol
+├── scripts
+│   ├── deploy_token.ts
+README.md
 ```
 
-### 2. Get the address for Node-1
+The `Sample_Network` folder contains the sample of the Hyperledger Besu network using [Clique](https://besu.hyperledger.org/private-networks/tutorials/clique).
 
-In Clique networks, you must include the address of at least one initial signer in the genesis file. For this Clique network, we'll use Node-1 as the initial signer. This requires obtaining the address for Node-1.
+The `Token_Contract` folder contains a [ERC-20 Smart Contract](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) (standard Ethereum token) code, with a script to deploy this contract using the [hardhat library](https://hardhat.org/).
 
-To get the address for Node-1, in the `Node-1` directory, use the [`public-key export-address`](../../public-networks/reference/cli/subcommands.md#export-address) subcommand to write the node address to the specified file (`node1Address` in this example).
+The `Token_Client` folder contains a Node.js client that interacts with the deployed Token contract using [web3.js library](https://web3js.readthedocs.io/en/v1.10.0/).
 
-<Tabs>
+## Starting Besu network
 
-<TabItem value="MacOS" label="MacOS" default>
+### Pre-requisites
+
+- [Hyperledger Besu](https://besu.hyperledger.org/private-networks/get-started/install/binary-distribution)
+
+The `Sample_Network` folder is already prepared for running the network locally, so you only need to run the script files.
+
+1. Go to the scripts folder
 
 ```bash
-besu --data-path=data public-key export-address --to=data/node1Address
+cd Sample_Network/scripts
 ```
 
-</TabItem>
-
-<TabItem value="Windows" label="Windows">
+2. Give the scripts the necessary permission
 
 ```bash
-besu --data-path=data public-key export-address --to=data\node1Address
+chmod +x start_node1.sh && chmod +x start_node2.sh && chmod +x start_node3.sh
 ```
 
-</TabItem>
-
-</Tabs>
-
-### 3. Create the genesis file
-
-The genesis file defines the genesis block of the blockchain (that is, the start of the blockchain). The [Clique genesis file](../how-to/configure/consensus/clique.md#genesis-file) includes the address of Node-1 as the initial signer in the `extraData` field.
-
-All nodes in a network must use the same genesis file.
-
-Copy the following genesis definition to a file called `cliqueGenesis.json` and save it in the `Clique-Network` directory:
-
-```json
-{
-  "config": {
-    "chainId": 1337,
-    "berlinBlock": 0,
-    "clique": {
-      "blockperiodseconds": 15,
-      "epochlength": 30000
-    }
-  },
-  "coinbase": "0x0000000000000000000000000000000000000000",
-  "difficulty": "0x1",
-
-  "extraData": "0x0000000000000000000000000000000000000000000000000000000000000000<Node 1 Address>0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  "gasLimit": "0xa00000",
-  "mixHash": "0x0000000000000000000000000000000000000000000000000000000000000000",
-  "nonce": "0x0",
-  "timestamp": "0x5c51a607",
-  "alloc": {
-    "fe3b557e8fb62b89f4916b721be55ceb828dbd73": {
-      "privateKey": "8f2a55949038a9610f50fb23b5883af3b4ecb3c3bb792cbcefbd1542c692be63",
-      "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
-      "balance": "0xad78ebc5ac6200000"
-    },
-    "627306090abaB3A6e1400e9345bC60c78a8BEf57": {
-      "privateKey": "c87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3",
-      "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
-      "balance": "90000000000000000000000"
-    },
-    "f17f52151EbEF6C7334FAD080c5704D77216b732": {
-      "privateKey": "ae6ae8e5ccbfb04590405997ee2d52d2b330726137b875053c36d94e974d162f",
-      "comment": "private key and this comment are ignored.  In a real chain, the private key should NOT be stored",
-      "balance": "90000000000000000000000"
-    }
-  }
-}
-```
-
-:::note
-
-We recommend specifying the latest [milestone](../../public-networks/reference/genesis-items.md#milestone-blocks) when creating the genesis file for a private network. This ensures you are using the most up-to-date protocol and have access to the most recent opcodes.
-
-:::
-
-In `extraData`, replace `<Node 1 Address>` with the [address for Node-1](#2-get-the-address-for-node-1), excluding the 0x prefix.
-
-```json
-{
-  ...
-"extraData":"0x0000000000000000000000000000000000000000000000000000000000000000b9b81ee349c3807e46bc71aa2632203c5b4620340000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-  ...
-}
-```
-
-:::warning
-
-Do not use the accounts in `alloc` in the genesis file on Mainnet or any public network except for testing. The private keys display, which means the accounts are not secure.
-
-:::
-
-### 4. Start the first node as the bootnode
-
-Start Node-1:
-
-<Tabs>
-
-<TabItem value="MacOS" label="MacOS" default>
+3. Start the first node
 
 ```bash
-besu --data-path=data --genesis-file=../cliqueGenesis.json --network-id 123 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-allowlist="*" --rpc-http-cors-origins="all"
+./start_node1.sh
 ```
 
-</TabItem>
-
-<TabItem value="Windows" label="Windows">
+4. Go to another terminal and start the second node
 
 ```bash
-besu --data-path=data --genesis-file=..\cliqueGenesis.json --network-id 123 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-allowlist="*" --rpc-http-cors-origins="all"
+./start_node2.sh
 ```
 
-</TabItem>
-
-</Tabs>
-
-The command line enables:
-
-- The JSON-RPC API using the [`--rpc-http-enabled`](../../public-networks/reference/cli/options.md#rpc-http-enabled) option
-- The ETH, NET, and CLIQUE APIs using the [`--rpc-http-api`](../../public-networks/reference/cli/options.md#rpc-http-api) option
-- All-host access to the HTTP JSON-RPC API using the [`--host-allowlist`](../../public-networks/reference/cli/options.md#host-allowlist) option
-- All-domain access to the node through the HTTP JSON-RPC API using the [`--rpc-http-cors-origins`](../../public-networks/reference/cli/options.md#rpc-http-cors-origins) option
-
-When the node starts, the [enode URL](../../public-networks/concepts/node-keys.md#enode-url) displays. Copy the enode URL to specify Node-1 as the bootnode in the following steps.
-
-![Node 1 Enode URL](../../assets/images/EnodeStartup.png)
-
-### 5. Start Node-2
-
-Start another terminal, change to the `Node-2` directory and start Node-2 specifying the Node-1 enode URL copied when starting Node-1 as the bootnode:
-
-<Tabs>
-
-<TabItem value="MacOS" label="MacOS" default>
+5. Go to another terminal and start the third node
 
 ```bash
-besu --data-path=data --genesis-file=../cliqueGenesis.json --bootnodes=<Node-1 Enode URL> --network-id 123 --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-allowlist="*" --rpc-http-cors-origins="all" --rpc-http-port=8546
+./start_node3.sh
 ```
 
-</TabItem>
+## Deploying the Token contract
 
-<TabItem value="Windows" label="Windows">
+### Pre-requisites
+
+- [Node.js](https://nodejs.org/en)
+
+The `Token_Contract` folder is already prepared for deploying the contract, so you only need to run the deploy script.
+
+**Note: The Besu nodes needs to be up and running for deploying the contract.**
+
+**Optional Step**
+
+If you want to change the token name and asset code, go to the contracts folder:
 
 ```bash
-besu --data-path=data --genesis-file=..\cliqueGenesis.json --bootnodes=<Node-1 Enode URL> --network-id 123 --p2p-port=30304 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-allowlist="*" --rpc-http-cors-origins="all" --rpc-http-port=8546
+cd Token_Contract/contracts/
 ```
 
-</TabItem>
+Open the `Token.sol` file and edit the values on the contract constructor. sample:
 
-</Tabs>
+Previously:
 
-The command line specifies:
+```solidity
+    constructor(
+        address initialOwner
+    )
+        ERC20("GuildToken", "GTK")
+        Ownable(initialOwner)
+        ERC20Permit("GuildToken")
+    {}
+```
 
-- A different port to Node-1 for P2P discovery using the [`--p2p-port`](../../public-networks/reference/cli/options.md#p2p-port) option.
-- A different port to Node-1 for HTTP JSON-RPC using the [`--rpc-http-port`](../../public-networks/reference/cli/options.md#rpc-http-port) option.
-- The enode URL of Node-1 using the [`--bootnodes`](../../public-networks/reference/cli/options.md#bootnodes) option.
-- The data directory for Node-2 using the [`--data-path`](../../public-networks/reference/cli/options.md#data-path) option.
-- Other options as for [Node-1](#4-start-the-first-node-as-the-bootnode).
+After, where `AnotherName` is the desired token name and `ANTK` is the desired asset code:
 
-### 6. Start Node-3
+```solidity
+    constructor(
+        address initialOwner
+    )
+        ERC20("AnotherName", "ANTK")
+        Ownable(initialOwner)
+        ERC20Permit("AnotherName")
+    {}
+```
 
-Start another terminal, change to the `Node-3` directory and start Node-3 specifying the Node-1 enode URL copied when starting Node-1 as the bootnode:
-
-<Tabs>
-
-<TabItem value="MacOS" label="MacOS" default>
+For deploying the contract first go to the contract folder:
 
 ```bash
-besu --data-path=data --genesis-file=../cliqueGenesis.json --bootnodes=<Node-1 Enode URL> --network-id 123 --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-allowlist="*" --rpc-http-cors-origins="all" --rpc-http-port=8547
+cd Token_Contract/
 ```
 
-</TabItem>
-
-<TabItem value="Windows" label="Windows">
+Install the libraries:
 
 ```bash
-besu --data-path=data --genesis-file=..\cliqueGenesis.json --bootnodes=<Node-1 Enode URL> --network-id 123 --p2p-port=30305 --rpc-http-enabled --rpc-http-api=ETH,NET,CLIQUE --host-allowlist="*" --rpc-http-cors-origins="all" --rpc-http-port=8547
+npm install
 ```
 
-</TabItem>
-
-</Tabs>
-
-The command line specifies:
-
-- A different port to Node-1 and Node-2 for P2P discovery using the [`--p2p-port`](../../public-networks/reference/cli/options.md#p2p-port) option.
-- A different port to Node-1 and Node-2 for HTTP JSON-RPC using the [`--rpc-http-port`](../../public-networks/reference/cli/options.md#rpc-http-port) option.
-- The data directory for Node-3 using the [`--data-path`](../../public-networks/reference/cli/options.md#data-path) option.
-- The bootnode as for [Node-2](#5-start-node-2).
-- Other options as for [Node-1](#4-start-the-first-node-as-the-bootnode).
-
-### 7. Confirm the private network is working
-
-Start another terminal, use curl to call the JSON-RPC API [`net_peerCount`](../../public-networks/reference/api/index.md#net_peercount) method and confirm the nodes are functioning as peers:
+Then run the deploy command:
 
 ```bash
-curl -X POST --data '{"jsonrpc":"2.0","method":"net_peerCount","params":[],"id":1}' localhost:8545
+npm run deploy
 ```
 
-The result confirms Node-1 has two peers (Node-2 and Node-3):
+This command will use the hardhat library for deploying the contract.
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "result": "0x2"
-}
+## Interacting with the contract
+
+### Pre-requisites
+
+- [Node.js](https://nodejs.org/en)
+
+The `Token_Client` folder is already prepared for interacting with the contract, so you only need to run the commands on the terminal.
+
+**Note: The Besu nodes needs to be up and running and the contract needs to be deployed for interacting with it.**
+
+For interacting with the contract go to the contract client folder:
+
+```bash
+cd Token_Client/
 ```
 
-## Next steps
+Install the libraries:
 
-Look at the logs displayed to confirm Node-1 is producing blocks and Node-2 and Node-3 are importing blocks.
+```bash
+npm install
+```
 
-Use the [Clique API to add] Node-2 or Node-3 as a signer.
+Then run the `assetCode` command to check if the client is communicating with Besu correctly:
 
-:::note
+```bash
+npm run assetCode
+```
 
-To add Node-2 or Node-3 as a signer you need the [node address as when specifying Node-1](#2-get-the-address-for-node-1) as the initial signer.
+This command should return the assetCode used in the contract. If you did not change it, should return `GTK`.
 
-:::
+### Available commands:
 
-Import accounts to MetaMask and send transactions, as described in the [Quickstart tutorial](quickstart.md#create-a-transaction-using-metamask).
+Get the asset name
 
-:::info
+```bash
+npm run name
+```
 
-Besu doesn't support [private key management](../../public-networks/how-to/send-transactions.md).
+Mint a specified amount of the token to the owner account
 
-:::
+```bash
+npm run mint <amount>
+```
 
-## Stop the nodes
+Get the owner account balance
 
-When finished using the private network, stop all nodes using ++ctrl+c++ in each terminal window.
-
-:::tip
-
-To restart the Clique network in the future, start from [4. Start First Node as Bootnode](#4-start-the-first-node-as-the-bootnode).
-
-:::
-
-<!-- Links -->
-
-[Clique (proof of authority) consensus protocol]: ../how-to/configure/consensus/clique.md
-[Clique API to add]: ../how-to/configure/consensus/clique.md#add-and-remove-signers
+```bash
+npm run balance
+```
