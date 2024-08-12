@@ -1,0 +1,23 @@
+{
+  "name": "token-client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "assetCode": "NODE_NO_WARNINGS=1 npx ts-node index.ts assetCode",
+    "name": "NODE_NO_WARNINGS=1 npx ts-node index.ts name",
+    "mint": "NODE_NO_WARNINGS=1 npx ts-node index.ts mint",
+    "balance": "NODE_NO_WARNINGS=1 npx ts-node index.ts balance"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "web3": "^4.11.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.2.0",
+    "typescript": "^5.5.4"
+  }
+}
