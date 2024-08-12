@@ -1,8 +1,10 @@
 # Introduction to Hyperledger Besu Guild
 
-This repository was created as a sample of **Hyperledger Besu**.
+This repository serves as a comprehensive sample project for Hyperledger Besu, an Ethereum client designed to meet enterprise needs, offering both permissioned and public network functionalities.
 
-The folder structure looks like this:
+## Repository Structure
+
+The folder structure of this project is organized as follows:
 
 ```bash
 Sample_Network/
@@ -22,71 +24,75 @@ Token_Contract/
 README.md
 ```
 
-The `Sample_Network` folder contains the sample of the Hyperledger Besu network using [Clique](https://besu.hyperledger.org/private-networks/tutorials/clique).
+### Folder Description
 
-The `Token_Contract` folder contains a [ERC-20 Smart Contract](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/) (standard Ethereum token) code, with a script to deploy this contract using the [hardhat library](https://hardhat.org/).
+- `Sample_Network`: Contains a sample Hyperledger Besu network setup using the [Clique consensus protocol](https://besu.hyperledger.org/private-networks/tutorials/clique). The nodes in this folder are preconfigured to simulate a simple private network.
+- `Token_Contract`: Houses the code for an [ERC-20 Smart Contract](https://ethereum.org/en/developers/docs/standards/tokens/erc-20/), which is a standard for creating fungible tokens on the Ethereum blockchain. This folder also includes deployment scripts leveraging the Hardhat development environment.
+- `Token_Client`: Contains a Node.js client that interacts with the deployed token contract using the [web3.js library](https://web3js.readthedocs.io/en/v1.10.0/). This client provides several commands to interact with the token contract, such as checking the token name, minting new tokens, and checking account balances.
 
-The `Token_Client` folder contains a Node.js client that interacts with the deployed Token contract using [web3.js library](https://web3js.readthedocs.io/en/v1.10.0/).
-
-## Starting Besu network
+## Setting Up the Besu Network
 
 ### Pre-requisites
 
+Before you begin, ensure you have the following installed:
+
 - [Hyperledger Besu](https://besu.hyperledger.org/private-networks/get-started/install/binary-distribution)
 
-The `Sample_Network` folder is already prepared for running the network locally, so you only need to run the script files.
+The `Sample_Network` folder is preconfigured for local execution. To start the network, follow these steps:
 
-1. Go to the scripts folder
+1. Navigate to the scripts folder:
 
 ```bash
 cd Sample_Network/scripts
 ```
 
-2. Give the scripts the necessary permission
+2. Set execution permissions for the scripts:
 
 ```bash
 chmod +x start_node1.sh && chmod +x start_node2.sh && chmod +x start_node3.sh
 ```
 
-3. Start the first node
+3. Start the first node:
 
 ```bash
 ./start_node1.sh
 ```
 
-4. Go to another terminal and start the second node
+4. Open a new terminal and start the second node:
 
 ```bash
 ./start_node2.sh
 ```
 
-5. Go to another terminal and start the third node
+5. Open another terminal and start the third node:
 
 ```bash
 ./start_node3.sh
 ```
 
-## Deploying the Token contract
+## Deploying the Token Contract
 
 ### Pre-requisites
 
+Before you begin, ensure you have the following installed:
+
 - [Node.js](https://nodejs.org/en)
 
-The `Token_Contract` folder is already prepared for deploying the contract, so you only need to run the deploy script.
+The `Token_Contract` folder is preconfigured for deploying the token contract. Please note that the Besu nodes must be running before deploying the contract.
 
-**Note: The Besu nodes needs to be up and running for deploying the contract.**
+**Optional: Customizing the Token**
 
-**Optional Step**
+If you wish to customize the token’s name and symbol, follow these steps:
 
-If you want to change the token name and asset code, go to the contracts folder:
+1. Navigate to the contracts folder:
 
 ```bash
 cd Token_Contract/contracts/
 ```
 
-Open the `Token.sol` file and edit the values on the contract constructor. sample:
+2. Open the Token.sol file and edit the contract constructor as needed. For example, to change the token name to “AnotherName” and the symbol to “ANTK”, update the following lines:
 
-Previously:
+Before:
 
 ```solidity
     constructor(
@@ -98,7 +104,7 @@ Previously:
     {}
 ```
 
-After, where `AnotherName` is the desired token name and `ANTK` is the desired asset code:
+After:
 
 ```solidity
     constructor(
@@ -110,72 +116,80 @@ After, where `AnotherName` is the desired token name and `ANTK` is the desired a
     {}
 ```
 
-For deploying the contract first go to the contract folder:
+### Deploying the Contract
+
+1. Navigate to the contract folder:
 
 ```bash
 cd Token_Contract/
 ```
 
-Install the libraries:
+2. Install the necessary dependencies:
 
 ```bash
 npm install
 ```
 
-Then run the deploy command:
+3. Deploy the contract:
 
 ```bash
 npm run deploy
 ```
 
-This command will use the hardhat library for deploying the contract.
+This will use the Hardhat library to deploy the contract to your running Besu network.
 
-## Interacting with the contract
+## Interacting with the Deployed Contract
 
 ### Pre-requisites
 
 - [Node.js](https://nodejs.org/en)
 
-The `Token_Client` folder is already prepared for interacting with the contract, so you only need to run the commands on the terminal.
+Ensure that Node.js is installed, and the Besu network is running with the token contract already deployed.
 
-**Note: The Besu nodes needs to be up and running and the contract needs to be deployed for interacting with it.**
+To interact with the contract, follow these steps:
 
-For interacting with the contract go to the contract client folder:
+1. Navigate to the client folder:
 
 ```bash
 cd Token_Client/
 ```
 
-Install the libraries:
+2. Install the necessary dependencies:
 
 ```bash
 npm install
 ```
 
-Then run the `assetCode` command to check if the client is communicating with Besu correctly:
+3. Verify the connection to the Besu network:
+
+Run the following command to check if the client is communicating correctly with Besu:
 
 ```bash
 npm run assetCode
 ```
 
-This command should return the assetCode used in the contract. If you did not change it, should return `GTK`.
+If successful, this command should return the asset code defined in the contract. For example, if unchanged, it should return `GTK`.
 
 ### Available commands:
 
-Get the asset name
+- Get the token name:
 
 ```bash
 npm run name
 ```
 
-Mint a specified amount of the token to the owner account
+- Mint a specified amount of tokens to the owner account:
 
 ```bash
 npm run mint <amount>
 ```
 
-Get the owner account balance
+- Check the owner account balance:
 
 ```bash
 npm run balance
 ```
+
+These commands allow you to interact with the deployed token contract, enabling token minting, querying balances, and more.
+
+This README provides a detailed guide on setting up a Hyperledger Besu network, deploying an ERC-20 token contract, and interacting with it using Node.js. Follow the steps carefully to ensure a successful setup and deployment process.
