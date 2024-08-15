@@ -81,13 +81,19 @@ To monitor the network using Prometheus, follow these steps:
 cd Sample_Network/scripts
 ```
 
-2. Start Prometheus:
+2. Install prometheus:
+
+```bash
+brew install prometheus
+```
+
+3. Start Prometheus:
 
 ```bash
 ./start_prometheus.sh
 ```
 
-3. Open a browser and navigate to `http://localhost:9090` to access the Prometheus dashboard. More infomation on setting up Prometheus can be found in the [Hyperledger Besu documentation](https://besu.hyperledger.org/development/public-networks/how-to/monitor/metrics#view-prometheus-graphical-interface).
+4. Open a browser and navigate to `http://localhost:9090` to access the Prometheus dashboard. More infomation on setting up Prometheus can be found in the [Hyperledger Besu documentation](https://besu.hyperledger.org/development/public-networks/how-to/monitor/metrics#view-prometheus-graphical-interface).
 
 To know more about the network setup, refer to the [Hyperledger Besu documentation](https://besu.hyperledger.org/private-networks/tutorials/clique).
 
@@ -159,6 +165,14 @@ npm run deploy
 
 This will use the Hardhat library to deploy the contract to your running Besu network.
 
+4. Copy the contract address from the output:
+
+```bash
+Token deployed
+Token address
+0x...
+```
+
 ## Interacting with the Deployed Contract
 
 ### Pre-requisites
@@ -181,7 +195,15 @@ cd Token_Client/
 npm install
 ```
 
-3. Verify the connection to the Besu network:
+3. Update the contract address:
+
+Open the `index.ts` file and update the `CONTRACT_ADDRESS` variable with the address of the deployed token contract:
+
+```typescript
+const contractAddress = "0x..."; // Update this with the deployed contract address
+```
+
+4. Verify the connection to the Besu network:
 
 Run the following command to check if the client is communicating correctly with Besu:
 
